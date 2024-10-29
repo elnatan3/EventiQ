@@ -1,0 +1,42 @@
+// src/scss/Dashboard.scss
+.dashboard {
+    padding: 2rem;
+  
+    &__header {
+      text-align: center;
+      margin-bottom: 2rem;
+  
+      h1 {
+        font-size: 2rem;
+        color: #333;
+      }
+  
+      p {
+        color: #666;
+      }
+    }
+  
+    &__content {
+      display: flex;
+      justify-content: space-around;
+      gap: 2rem;
+  
+      .dashboard__events,
+      .dashboard__create {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+        h2 {
+          font-size: 1.5rem;
+          color: #333;
+        }
+  
+        p {
+          color: #555;
+        }
+      }
+    }
+  }
+  
