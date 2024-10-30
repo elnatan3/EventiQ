@@ -1,49 +1,193 @@
 // src/scss/HomePage.scss
+
+:root {
+  --background: linear-gradient(135deg, #f0f2f5, #e0eafc);
+  --primary: #007bff;
+  --text: #333;
+  --accent: #666;
+  --button-text: #fff;
+}
+
+[data-theme="dark"] {
+  --background: linear-gradient(135deg, #1b1e23, #0f0f0f);
+  --primary: #8a2be2;
+  --text: #0b0a0a;
+  --accent: #bbb;
+  --button-text: #fff;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+  transition: background 0.4s ease, color 0.4s ease;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .homepage {
+  display: flex;
+  flex-direction: column;
+  margin-top: -8rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 8rem;
+  overflow: hidden;
+  position: relative;
+
+  .theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 20px;
+    background-color: var(--primary);
+    color: var(--button-text);
+    transition: transform 0.2s;
+  }
+
+  &__header {
     text-align: center;
-    padding: 2rem;
-  
-    &__header {
-      margin-bottom: 1rem;
+    margin-bottom: 3rem;
+    z-index: 1;
+    position: relative;
+  }
+
+  &__title {
+    font-size: clamp(4rem, 10vw, 6rem);
+    font-weight: 800;
+    color: var(--primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__subtitle {
+    font-size: 1.8rem;
+    color: var(--accent);
+    margin-top: 0.5rem;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    padding: 3rem;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    max-width: 1000px;
+    text-align: center;
+  }
+
+  &__features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  &__feature-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(20px);
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+
+    &.is-visible {
+      opacity: 1;
+      transform: translateY(0);
     }
-  
-    &__title {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #333;
-    }
-  
-    &__subtitle {
-      font-size: 1.25rem;
-      color: #555;
-      margin-bottom: 1.5rem;
-    }
-  
-    &__features {
-      list-style-type: none;
-      padding: 0;
-      font-size: 1rem;
-      color: #666;
-      margin-bottom: 2rem;
-  
-      li {
-        margin: 0.5rem 0;
-      }
-    }
-  
-    &__button {
-      font-size: 1rem;
-      padding: 0.75rem 1.5rem;
-      color: #fff;
-      background-color: #007bff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-  
-      &:hover {
-        background-color: #0056b3;
-      }
+
+    p {
+      font-size: 1.2rem;
+      color: var(--text);
+      text-align: center;
+      margin: 0;
     }
   }
-  
+
+  &__button {
+    font-size: 1.4rem;
+    padding: 1rem 2.5rem;
+    color: var(--button-text);
+    background: var(--primary);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      filter: brightness(0.9);
+      transform: scale(1.05);
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  // SVG Background Styling
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -1;
+
+    svg {
+      position: absolute;
+      opacity: 0.15;
+    }
+
+    &__svg-moon {
+      top: 5%;
+      left: 10%;
+      width: 180px;
+      height: 180px;
+    }
+
+    &__svg-earth {
+      bottom: 35%;
+      right: 15%;
+      width: 140px;
+      height: 140px;
+    }
+
+    &__stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+      background-size: 3px 3px;
+      animation: sparkle 10s linear infinite;
+    }
+  }
+}
+
+@keyframes sparkle {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-5%); }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
