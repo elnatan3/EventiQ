@@ -4,7 +4,7 @@ import { db, auth, storage } from "../firebase";
 import { collection, getDocs, addDoc, query, where, deleteDoc, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import "../scss/OrganizerDashboard.scss";
-import { FaTrash } from "react-icons/fa"; 
+import { FaTrash } from "react-icons/fa"; // Import trash icon
 
 function OrganizerDashboard() {
   const [activeTab, setActiveTab] = useState("create");
@@ -55,7 +55,7 @@ function OrganizerDashboard() {
       await uploadBytes(storageRef, file);
       const imageUrl = await getDownloadURL(storageRef);
       setEventData((prev) => ({ ...prev, imageUrl }));
-      setImagePreview(URL.createObjectURL(file)); 
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -74,7 +74,7 @@ function OrganizerDashboard() {
       alert("Event created successfully!");
       fetchEvents();
       setActiveTab("upcoming");
-      setImagePreview(null); 
+      setImagePreview(null);
     } catch (error) {
       console.error("Error creating event:", error);
     }
@@ -128,7 +128,6 @@ function OrganizerDashboard() {
             onDelete={deleteEvent}
             onToggleRegisteredUsers={toggleRegisteredUsers}
             selectedEvent={selectedEvent}
-            registeredUsers={registeredUsers}
           />
         )}
         {activeTab === "past" && (
@@ -136,15 +135,17 @@ function OrganizerDashboard() {
             events={pastEvents}
             onToggleRegisteredUsers={toggleRegisteredUsers}
             selectedEvent={selectedEvent}
-            registeredUsers={registeredUsers}
           />
+        )}
+        {selectedEvent && (
+          <Modal onClose={() => setSelectedEvent(null)} registeredUsers={registeredUsers} />
         )}
       </div>
     </div>
   );
 }
 
-function EventList({ events, onDelete, onToggleRegisteredUsers, selectedEvent, registeredUsers }) {
+function EventList({ events, onDelete, onToggleRegisteredUsers, selectedEvent }) {
   return (
     <div className="event-list">
       {events.map((event) => (
@@ -157,15 +158,26 @@ function EventList({ events, onDelete, onToggleRegisteredUsers, selectedEvent, r
             {selectedEvent === event.id ? "Close" : "See Registered Users"}
           </button>
           <FaTrash className="event-item__delete-icon" onClick={() => onDelete(event.id, event.imageUrl)} />
-          {selectedEvent === event.id && registeredUsers.length > 0 && (
-            <ul className="registered-users-list">
-              {registeredUsers.map((user, index) => (
-                <li key={index}>{user}</li>
-              ))}
-            </ul>
-          )}
         </div>
       ))}
+    </div>
+  );
+}
+
+function Modal({ onClose, registeredUsers }) {
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3>Registered Users</h3>
+        <button className="close-button" onClick={onClose}>Close</button>
+        <ul className="registered-users-list">
+          {registeredUsers.length > 0 ? (
+            registeredUsers.map((displayName, index) => <li key={index}>{displayName}</li>)
+          ) : (
+            <li>No registered users.</li>
+          )}
+        </ul>
+      </div>
     </div>
   );
 }
