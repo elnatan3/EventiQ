@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { db, auth } from "../firebase";
 import { collection, getDocs, query, where, addDoc, Timestamp, deleteDoc, doc } from "firebase/firestore";
-import "../scss/ParticipantDashboard.scss";
+import "../scss/participantDashboard.scss";
 import Alert from "./Alert"; // Import the custom Alert component
 
 function ParticipantDashboard() {
