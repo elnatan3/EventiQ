@@ -1,10 +1,10 @@
 // src/Components/OrganizerDashboard.js
 import React, { useState, useEffect } from "react";
-import { db, auth, storage } from "../firebase"; // Ensure auth is imported
+import { db, auth, storage } from "../firebase";
 import { collection, getDocs, addDoc, query, where, deleteDoc, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import "../scss/OrganizerDashboard.scss";
-import { FaTrash } from "react-icons/fa"; // Import trash icon
+import { FaTrash } from "react-icons/fa"; 
 
 function OrganizerDashboard() {
   const [activeTab, setActiveTab] = useState("create");
@@ -18,7 +18,8 @@ function OrganizerDashboard() {
     date: "",
     imageUrl: null,
   });
-  const currentUser = auth.currentUser; // Get the current user
+  const [imagePreview, setImagePreview] = useState(null);
+  const currentUser = auth.currentUser;
 
   const fetchEvents = async () => {
     const eventsRef = collection(db, "events");
@@ -54,6 +55,7 @@ function OrganizerDashboard() {
       await uploadBytes(storageRef, file);
       const imageUrl = await getDownloadURL(storageRef);
       setEventData((prev) => ({ ...prev, imageUrl }));
+      setImagePreview(URL.createObjectURL(file)); 
     }
   };
 
@@ -61,17 +63,18 @@ function OrganizerDashboard() {
     e.preventDefault();
     if (!currentUser) return;
 
-    const organizerEmailDomain = currentUser.email.split('@')[1]; // Get email domain
+    const organizerEmailDomain = currentUser.email.split('@')[1];
     try {
       await addDoc(collection(db, "events"), {
         ...eventData,
         date: new Date(eventData.date),
         createdAt: new Date(),
-        emailDomain: organizerEmailDomain, // Save email domain with event
+        emailDomain: organizerEmailDomain,
       });
       alert("Event created successfully!");
-      fetchEvents(); // Refresh events list after creation
+      fetchEvents();
       setActiveTab("upcoming");
+      setImagePreview(null); 
     } catch (error) {
       console.error("Error creating event:", error);
     }
@@ -85,9 +88,18 @@ function OrganizerDashboard() {
         await deleteObject(imageRef);
       }
       alert("Event deleted successfully!");
-      fetchEvents(); // Refresh events list after deletion
+      fetchEvents();
     } catch (error) {
       console.error("Error deleting event:", error);
+    }
+  };
+
+  const toggleRegisteredUsers = (eventId) => {
+    if (selectedEvent === eventId) {
+      setSelectedEvent(null); 
+    } else {
+      fetchRegisteredUsers(eventId); 
+      setSelectedEvent(eventId);
     }
   };
 
@@ -105,6 +117,7 @@ function OrganizerDashboard() {
             <input type="text" name="title" placeholder="Event Title" onChange={handleInputChange} required />
             <textarea name="description" placeholder="Event Description" onChange={handleInputChange} required />
             <input type="file" accept="image/*" onChange={handleFileChange} />
+            {imagePreview && <img src={imagePreview} alt="Preview" className="image-preview" />} {/* Show image preview */}
             <input type="datetime-local" name="date" onChange={handleInputChange} required />
             <button type="submit">Create Event</button>
           </form>
@@ -113,25 +126,17 @@ function OrganizerDashboard() {
           <EventList
             events={upcomingEvents}
             onDelete={deleteEvent}
-            onSeeRegisteredUsers={(eventId) => {
-              fetchRegisteredUsers(eventId);
-              setSelectedEvent(eventId);
-            }}
+            onToggleRegisteredUsers={toggleRegisteredUsers}
+            selectedEvent={selectedEvent}
+            registeredUsers={registeredUsers}
           />
         )}
         {activeTab === "past" && (
           <EventList
             events={pastEvents}
-            onSeeRegisteredUsers={(eventId) => {
-              fetchRegisteredUsers(eventId);
-              setSelectedEvent(eventId);
-            }}
-          />
-        )}
-        {selectedEvent && (
-          <RegisteredUsersList
-            users={registeredUsers}
-            onClose={() => setSelectedEvent(null)}
+            onToggleRegisteredUsers={toggleRegisteredUsers}
+            selectedEvent={selectedEvent}
+            registeredUsers={registeredUsers}
           />
         )}
       </div>
@@ -139,40 +144,28 @@ function OrganizerDashboard() {
   );
 }
 
-function EventList({ events, onDelete, onSeeRegisteredUsers }) {
+function EventList({ events, onDelete, onToggleRegisteredUsers, selectedEvent, registeredUsers }) {
   return (
     <div className="event-list">
       {events.map((event) => (
         <div key={event.id} className="event-item">
-          {event.imageUrl && (
-            <img src={event.imageUrl} alt={event.title} className="event-item__image" />
-          )}
+          {event.imageUrl && <img src={event.imageUrl} alt={event.title} className="event-item__image" />}
           <h4>{event.title}</h4>
           <p>{event.description}</p>
           <p>{new Date(event.date.seconds * 1000).toLocaleString()}</p>
-          <button onClick={() => onSeeRegisteredUsers(event.id)}>See Registered Users</button>
-          <FaTrash
-            className="event-item__delete-icon"
-            onClick={() => onDelete(event.id, event.imageUrl)}
-          />
+          <button onClick={() => onToggleRegisteredUsers(event.id)}>
+            {selectedEvent === event.id ? "Close" : "See Registered Users"}
+          </button>
+          <FaTrash className="event-item__delete-icon" onClick={() => onDelete(event.id, event.imageUrl)} />
+          {selectedEvent === event.id && registeredUsers.length > 0 && (
+            <ul className="registered-users-list">
+              {registeredUsers.map((user, index) => (
+                <li key={index}>{user}</li>
+              ))}
+            </ul>
+          )}
         </div>
       ))}
-    </div>
-  );
-}
-
-function RegisteredUsersList({ users, onClose }) {
-  return (
-    <div className="registered-users-list">
-      <h3>Registered Users</h3>
-      <button onClick={onClose}>Close</button>
-      <ul>
-        {users.length > 0 ? (
-          users.map((displayName, index) => <li key={index}>{displayName}</li>)
-        ) : (
-          <li>No registered users.</li>
-        )}
-      </ul>
     </div>
   );
 }
