@@ -4,7 +4,7 @@ import { db, auth, storage } from "../firebase";
 import { collection, getDocs, addDoc, query, where, deleteDoc, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import "../scss/OrganizerDashboard.scss";
-import { FaTrash } from "react-icons/fa"; // Import trash icon
+import { FaTrash } from "react-icons/fa";
 
 function OrganizerDashboard() {
   const [activeTab, setActiveTab] = useState("create");
@@ -19,6 +19,7 @@ function OrganizerDashboard() {
     imageUrl: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
+  const [registrationCounts, setRegistrationCounts] = useState({});
   const currentUser = auth.currentUser;
 
   const fetchEvents = async () => {
@@ -29,19 +30,23 @@ function OrganizerDashboard() {
     const now = new Date();
     setUpcomingEvents(eventsData.filter((event) => new Date(event.date.seconds * 1000) >= now));
     setPastEvents(eventsData.filter((event) => new Date(event.date.seconds * 1000) < now));
+    fetchRegistrationCounts(eventsData.map(event => event.id)); 
+  };
+
+  const fetchRegistrationCounts = async (eventIds) => {
+    const counts = {};
+    for (const eventId of eventIds) {
+      const registrationsRef = collection(db, "registrations");
+      const registeredUsersQuery = query(registrationsRef, where("eventId", "==", eventId));
+      const registrationsSnapshot = await getDocs(registeredUsersQuery);
+      counts[eventId] = registrationsSnapshot.size; 
+    }
+    setRegistrationCounts(counts);
   };
 
   useEffect(() => {
     fetchEvents();
   }, []);
-
-  const fetchRegisteredUsers = async (eventId) => {
-    const registrationsRef = collection(db, "registrations");
-    const registeredUsersQuery = query(registrationsRef, where("eventId", "==", eventId));
-    const registrationsSnapshot = await getDocs(registeredUsersQuery);
-    const usersData = registrationsSnapshot.docs.map((doc) => doc.data().displayName);
-    setRegisteredUsers(usersData);
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -96,11 +101,19 @@ function OrganizerDashboard() {
 
   const toggleRegisteredUsers = (eventId) => {
     if (selectedEvent === eventId) {
-      setSelectedEvent(null); 
+      setSelectedEvent(null);
     } else {
-      fetchRegisteredUsers(eventId); 
+      fetchRegisteredUsers(eventId);
       setSelectedEvent(eventId);
     }
+  };
+
+  const fetchRegisteredUsers = async (eventId) => {
+    const registrationsRef = collection(db, "registrations");
+    const registeredUsersQuery = query(registrationsRef, where("eventId", "==", eventId));
+    const registrationsSnapshot = await getDocs(registeredUsersQuery);
+    const usersData = registrationsSnapshot.docs.map((doc) => doc.data().displayName);
+    setRegisteredUsers(usersData);
   };
 
   return (
@@ -117,7 +130,7 @@ function OrganizerDashboard() {
             <input type="text" name="title" placeholder="Event Title" onChange={handleInputChange} required />
             <textarea name="description" placeholder="Event Description" onChange={handleInputChange} required />
             <input type="file" accept="image/*" onChange={handleFileChange} />
-            {imagePreview && <img src={imagePreview} alt="Preview" className="image-preview" />} {/* Show image preview */}
+            {imagePreview && <img src={imagePreview} alt="Preview" className="image-preview" />}
             <input type="datetime-local" name="date" onChange={handleInputChange} required />
             <button type="submit">Create Event</button>
           </form>
@@ -128,6 +141,7 @@ function OrganizerDashboard() {
             onDelete={deleteEvent}
             onToggleRegisteredUsers={toggleRegisteredUsers}
             selectedEvent={selectedEvent}
+            registrationCounts={registrationCounts}
           />
         )}
         {activeTab === "past" && (
@@ -135,6 +149,7 @@ function OrganizerDashboard() {
             events={pastEvents}
             onToggleRegisteredUsers={toggleRegisteredUsers}
             selectedEvent={selectedEvent}
+            registrationCounts={registrationCounts}
           />
         )}
         {selectedEvent && (
@@ -145,7 +160,7 @@ function OrganizerDashboard() {
   );
 }
 
-function EventList({ events, onDelete, onToggleRegisteredUsers, selectedEvent }) {
+function EventList({ events, onDelete, onToggleRegisteredUsers, selectedEvent, registrationCounts }) {
   return (
     <div className="event-list">
       {events.map((event) => (
@@ -154,6 +169,7 @@ function EventList({ events, onDelete, onToggleRegisteredUsers, selectedEvent })
           <h4>{event.title}</h4>
           <p>{event.description}</p>
           <p>{new Date(event.date.seconds * 1000).toLocaleString()}</p>
+          <p>Total Registered: {registrationCounts[event.id] || 0}</p> 
           <button onClick={() => onToggleRegisteredUsers(event.id)}>
             {selectedEvent === event.id ? "Close" : "See Registered Users"}
           </button>
