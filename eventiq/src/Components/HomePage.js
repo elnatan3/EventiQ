@@ -1,17 +1,21 @@
 // src/components/HomePage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
 import "../scss/HomePage.scss";
 
 function HomePage() {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
   };
 
   const handleGetStarted = () => {
@@ -24,7 +28,7 @@ function HomePage() {
     "Exclusive domain-based event access.",
     "Advanced analytics and reporting.",
     "Customized event branding.",
-    "24/7 support and assistance."
+    "24/7 support and assistance.",
   ];
 
   return (
@@ -34,8 +38,8 @@ function HomePage() {
       </div>
 
       <header className="homepage__header">
-        <h1 className="homepage__title">
-          EventIQ <span className="homepage__subtitle">The Future of Events</span>
+        <h1 className="homepage__title" style={{ fontFamily: "'Pacifico', cursive", fontSize: '60px' }}>
+          EventIQ 
         </h1>
       </header>
 
@@ -50,27 +54,13 @@ function HomePage() {
         </button>
       </div>
 
-      {/* SVG Background Design */}
       <div className="homepage__background">
-        <svg className="homepage__svg-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="80" fill="url(#moonGradient)" />
-          <defs>
-            <radialGradient id="moonGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#FFF4E0" />
-              <stop offset="100%" stopColor="#B0A090" />
-            </radialGradient>
-          </defs>
-        </svg>
-        <svg className="homepage__svg-earth" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="50" fill="url(#earthGradient)" />
-          <defs>
-            <radialGradient id="earthGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#67C8FF" />
-              <stop offset="100%" stopColor="#006994" />
-            </radialGradient>
-          </defs>
-        </svg>
-        <div className="homepage__stars"></div>
+        {/* Enhanced Background with Multiple Animated Elements */}
+        <div className="homepage__curve"></div>
+        <div className="moon"></div>
+        <div className="earth"></div>
+        <div className="floating-star"></div>
+        <div className="orbiting-circle"></div>
       </div>
     </div>
   );
@@ -88,6 +78,18 @@ function FeatureItem({ feature, index }) {
       className={`homepage__feature-item ${inView ? "is-visible" : ""}`}
       style={{ animationDelay: `${index * 0.3}s` }}
     >
+      <svg
+        className="homepage__feature-svg"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 200 100"
+      >
+        <path
+          d="M0,50 Q100,-20 200,50 T400,50"
+          fill="none"
+          stroke="#006994"
+          strokeWidth="8"
+        />
+      </svg>
       <p>{feature}</p>
     </div>
   );

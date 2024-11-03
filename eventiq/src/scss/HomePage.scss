@@ -1,193 +1,207 @@
-// src/scss/HomePage.scss
+/* src/scss/HomePage.scss */
 
-:root {
-  --background: linear-gradient(135deg, #f0f2f5, #e0eafc);
-  --primary: #007bff;
-  --text: #333;
-  --accent: #666;
-  --button-text: #fff;
-}
-
-[data-theme="dark"] {
-  --background: linear-gradient(135deg, #1b1e23, #0f0f0f);
-  --primary: #8a2be2;
-  --text: #0b0a0a;
-  --accent: #bbb;
-  --button-text: #fff;
-}
-
-body {
-  background: var(--background);
-  color: var(--text);
-  transition: background 0.4s ease, color 0.4s ease;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
 
 .homepage {
-  display: flex;
-  flex-direction: column;
-  margin-top: -8rem;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 8rem;
-  overflow: hidden;
   position: relative;
-
+  font-family: Arial, sans-serif;
+  
   .theme-toggle {
-    position: fixed;
+    cursor: pointer;
+    position: absolute;
     top: 1rem;
     right: 1rem;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    border-radius: 20px;
-    background-color: var(--primary);
-    color: var(--button-text);
-    transition: transform 0.2s;
+    font-size: 1.2rem;
+    z-index: 10;
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 
   &__header {
     text-align: center;
-    margin-bottom: 3rem;
-    z-index: 1;
-    position: relative;
-  }
+    padding: 2rem 0;
+    color: black;
 
-  &__title {
-    font-size: clamp(4rem, 10vw, 6rem);
-    font-weight: 800;
-    color: var(--primary);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+    &__title {
+      font-size: 6rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: black;
+      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    }
 
-  &__subtitle {
-    font-size: 1.8rem;
-    color: var(--accent);
-    margin-top: 0.5rem;
+    &__subtitle {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--secondary-color);
+    }
   }
 
   &__content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2.5rem;
     padding: 3rem;
-    z-index: 10;
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 15px;
-    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
-    max-width: 1000px;
-    text-align: center;
+    background-color: var(--box-bg-color);
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    max-width: 900px;
+    margin: 2rem auto;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.5s ease;
+    animation: float 4s ease-in-out infinite alternate;
   }
 
   &__features {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    max-width: 800px;
+    text-align: left;
   }
 
   &__feature-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-color: var(--box-bg-color);
+    padding: 1.8rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--text-color);
+    transform: translateY(30px);
     opacity: 0;
-    transform: translateY(20px);
-    background: #ffffff;
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition: all 0.8s ease;
 
     &.is-visible {
-      opacity: 1;
       transform: translateY(0);
+      opacity: 1;
     }
 
     p {
       font-size: 1.2rem;
-      color: var(--text);
-      text-align: center;
+      color: var(--text-color);
       margin: 0;
     }
   }
 
   &__button {
-    font-size: 1.4rem;
+    margin-top: 2.5rem;
     padding: 1rem 2.5rem;
-    color: var(--button-text);
-    background: var(--primary);
+    font-size: 1.1rem;
+    background-color: var(--button-color);
+    color: #fff;
     border: none;
-    border-radius: 30px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s ease, transform 0.3s ease;
 
     &:hover {
-      filter: brightness(0.9);
+      background-color: var(--button-hover-color);
       transform: scale(1.05);
-      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
     }
   }
 
-  // SVG Background Styling
   &__background {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    pointer-events: none;
     z-index: -1;
+    overflow: hidden;
 
-    svg {
+    .homepage__curve {
       position: absolute;
-      opacity: 0.15;
-    }
-
-    &__svg-moon {
-      top: 5%;
-      left: 10%;
-      width: 180px;
-      height: 180px;
-    }
-
-    &__svg-earth {
-      bottom: 35%;
-      right: 15%;
-      width: 140px;
-      height: 140px;
-    }
-
-    &__stars {
-      position: absolute;
-      top: 0;
-      left: 0;
+      bottom: 0;
       width: 100%;
-      height: 100%;
-      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
-      background-size: 3px 3px;
-      animation: sparkle 10s linear infinite;
+      height: 300px;
+      background: linear-gradient(to top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+      clip-path: ellipse(80% 50% at 50% 100%);
+    }
+
+    .moon, .earth, .floating-star, .orbiting-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float 6s ease-in-out infinite alternate;
+    }
+
+    .moon {
+      background: #e0eafc;
+      width: 120px;
+      height: 120px;
+      top: 15%;
+      left: 5%;
+    }
+
+    .earth {
+      background: #67C8FF;
+      width: 100px;
+      height: 100px;
+      bottom: 20%;
+      right: 10%;
+    }
+
+    .floating-star {
+      background: #FFD700;
+      width: 60px;
+      height: 60px;
+      top: 30%;
+      right: 15%;
+      animation: twinkle 5s infinite alternate;
+    }
+
+    .orbiting-circle {
+      background: transparent;
+      border: 3px dashed #FF8C00;
+      width: 200px;
+      height: 200px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: orbit 15s linear infinite;
     }
   }
 }
 
-@keyframes sparkle {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-5%); }
+/* Keyframes for floating animation */
+@keyframes float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10px);
+  }
 }
 
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes orbit {
+  0% { transform: rotate(0deg) translateX(-50%) translateY(-50%); }
+  100% { transform: rotate(360deg) translateX(-50%) translateY(-50%); }
+}
+
+/* Theme Colors */
+:root {
+  --primary-color: #333;
+  --secondary-color: #777;
+  --box-bg-color: #f9f9f9;
+  --text-color: #333;
+  --button-color: #006994;
+  --button-hover-color: #005680;
+}
+
+[data-theme="dark"] {
+  --primary-color: #fff;
+  --secondary-color: #ccc;
+  --box-bg-color: #333;
+  --text-color: #f9f9f9;
+  --button-color: #ff8c00;
+  --button-hover-color: #cc7300;
 }
