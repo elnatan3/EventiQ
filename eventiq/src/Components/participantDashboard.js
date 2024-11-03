@@ -3,14 +3,16 @@ import React, { useEffect, useState } from "react";
 import { db, auth } from "../firebase";
 import { collection, getDocs, query, where, addDoc, Timestamp, deleteDoc, doc } from "firebase/firestore";
 import "../scss/ParticipantDashboard.scss";
+import Alert from "./Alert"; // Import the custom Alert component
 
 function ParticipantDashboard() {
   const [activeTab, setActiveTab] = useState("all");
   const [allEvents, setAllEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
-  const [registeredEvents, setRegisteredEvents] = useState([]); 
-  const [refresh, setRefresh] = useState(false); 
+  const [registeredEvents, setRegisteredEvents] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const [alertMessage, setAlertMessage] = useState(""); // State for managing alert message
   const currentUser = auth.currentUser;
 
   const fetchEvents = async () => {
@@ -18,7 +20,7 @@ function ParticipantDashboard() {
     const userDomain = currentUser.email.split('@')[1];
 
     const eventsRef = collection(db, "events");
-    const domainQuery = query(eventsRef, where("emailDomain", "==", userDomain)); // Filter by email domain
+    const domainQuery = query(eventsRef, where("emailDomain", "==", userDomain));
     const eventsSnapshot = await getDocs(domainQuery);
     const eventsData = eventsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
@@ -64,13 +66,13 @@ function ParticipantDashboard() {
   const handleRegister = async (eventId, eventDate) => {
     try {
       if (!currentUser) {
-        alert("Please log in to register for events.");
+        setAlertMessage("Please log in to register for events.");
         return;
       }
 
       const now = new Date();
       if (new Date(eventDate.seconds * 1000) <= now) {
-        alert("Cannot register for past events.");
+        setAlertMessage("Cannot register for past events.");
         return;
       }
 
@@ -79,11 +81,11 @@ function ParticipantDashboard() {
         displayName: currentUser.displayName,
         registeredAt: Timestamp.now(),
       });
-      alert("Successfully registered for the event!");
-
-      setRefresh((prev) => !prev); 
+      setAlertMessage("Successfully registered for the event!");
+      setRefresh((prev) => !prev);
     } catch (error) {
       console.error("Error registering for event:", error);
+      setAlertMessage("Error registering for event.");
     }
   };
 
@@ -101,11 +103,12 @@ function ParticipantDashboard() {
 
       if (!registrationSnapshot.empty) {
         await deleteDoc(registrationSnapshot.docs[0].ref);
-        alert("Registration cancelled successfully!");
-        setRefresh((prev) => !prev); // Refresh the event lists
+        setAlertMessage("Registration cancelled successfully!");
+        setRefresh((prev) => !prev);
       }
     } catch (error) {
       console.error("Error cancelling registration:", error);
+      setAlertMessage("Error cancelling registration.");
     }
   };
 
@@ -128,6 +131,7 @@ function ParticipantDashboard() {
           <EventList events={pastEvents} registeredEvents={registeredEvents} />
         )}
       </div>
+      {alertMessage && <Alert message={alertMessage} onClose={() => setAlertMessage("")} />} {/* Render Alert */}
     </div>
   );
 }

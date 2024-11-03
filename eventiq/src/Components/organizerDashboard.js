@@ -4,6 +4,7 @@ import { db, auth, storage } from "../firebase";
 import { collection, getDocs, addDoc, query, where, deleteDoc, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import "../scss/OrganizerDashboard.scss";
+import Alert from "./Alert";
 import { FaTrash } from "react-icons/fa";
 
 function OrganizerDashboard() {
@@ -11,6 +12,7 @@ function OrganizerDashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [alertMessage, setAlertMessage] = useState("");
   const [registeredUsers, setRegisteredUsers] = useState([]);
   const [eventData, setEventData] = useState({
     title: "",
@@ -76,12 +78,13 @@ function OrganizerDashboard() {
         createdAt: new Date(),
         emailDomain: organizerEmailDomain,
       });
-      alert("Event created successfully!");
+      setAlertMessage("Event created successfully!");
       fetchEvents();
       setActiveTab("upcoming");
       setImagePreview(null);
     } catch (error) {
       console.error("Error creating event:", error);
+      setAlertMessage("Error creating event."); 
     }
   };
 
@@ -92,10 +95,11 @@ function OrganizerDashboard() {
         const imageRef = ref(storage, imageUrl);
         await deleteObject(imageRef);
       }
-      alert("Event deleted successfully!");
+      setAlertMessage("Event deleted successfully!");
       fetchEvents();
     } catch (error) {
       console.error("Error deleting event:", error);
+      setAlertMessage("Error deleting event.")
     }
   };
 
@@ -156,6 +160,7 @@ function OrganizerDashboard() {
           <Modal onClose={() => setSelectedEvent(null)} registeredUsers={registeredUsers} />
         )}
       </div>
+      {alertMessage && <Alert message={alertMessage} onClose={() => setAlertMessage("")} />} 
     </div>
   );
 }
