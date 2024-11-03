@@ -6,8 +6,8 @@ import { signInWithPopup } from "firebase/auth";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import HomePage from "./Components/HomePage";
 import ChooseRole from "./Components/ChooseRole";
-import OrganizerDashboard from "./Components/OrganizerDashboard";
-import ParticipantDashboard from "./Components/ParticipantDashboard";
+import OrganizerDashboard from "./Components/organizerDashboard";
+import ParticipantDashboard from "./Components/participantDashboard";
 
 function App() {
   const [user, setUser] = useState(null);
