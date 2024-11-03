@@ -3,12 +3,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../scss/ChooseRole.scss"; 
 
+// src/components/ChooseRole.js
 function ChooseRole({ signInWithGoogle }) {
   const navigate = useNavigate();
 
   const handleRoleSelect = async (selectedRole) => {
     try {
-      await signInWithGoogle();
+      await signInWithGoogle(selectedRole); // Pass the selected role here
       if (selectedRole === "Organizer") {
         navigate("/organizer-dashboard");
       } else if (selectedRole === "Participant") {

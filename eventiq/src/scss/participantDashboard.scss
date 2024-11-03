@@ -1,0 +1,23 @@
+// src/scss/ParticipantDashboard.scss
+.dashboard {
+    padding: 2rem;
+    .dashboard__tabs {
+      display: flex;
+      gap: 1rem;
+      button {
+        background: #007bff; // Use the primary color directly
+        color: var(--button-text);
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        &:hover {
+            background: darken(#007bff, 10%); // Apply darken directly to the color
+          }
+      }
+      
+    }
+    .dashboard__content {
+      margin-top: 2rem;
+    }
+  }
+  
