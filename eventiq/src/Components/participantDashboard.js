@@ -1,7 +1,7 @@
 // src/Components/ParticipantDashboard.js
 import React, { useEffect, useState } from "react";
 import { db, auth } from "../firebase";
-import { collection, getDocs, query, where, addDoc, Timestamp } from "firebase/firestore";
+import { collection, getDocs, query, where, addDoc, Timestamp, deleteDoc, doc } from "firebase/firestore";
 import "../scss/ParticipantDashboard.scss";
 
 function ParticipantDashboard() {
@@ -13,17 +13,19 @@ function ParticipantDashboard() {
   const [refresh, setRefresh] = useState(false); 
   const currentUser = auth.currentUser;
 
-  // Fetch all future events
   const fetchEvents = async () => {
+    if (!currentUser) return;
+    const userDomain = currentUser.email.split('@')[1];
+
     const eventsRef = collection(db, "events");
-    const eventsSnapshot = await getDocs(eventsRef);
+    const domainQuery = query(eventsRef, where("emailDomain", "==", userDomain)); // Filter by email domain
+    const eventsSnapshot = await getDocs(domainQuery);
     const eventsData = eventsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
     const now = new Date();
     setAllEvents(eventsData.filter((event) => new Date(event.date.seconds * 1000) > now));
   };
 
-  // Fetch user-registered events
   const fetchUserRegistrations = async () => {
     if (!currentUser) return;
 
@@ -85,6 +87,28 @@ function ParticipantDashboard() {
     }
   };
 
+  const handleCancelRegistration = async (eventId) => {
+    try {
+      if (!currentUser) return;
+
+      const registrationsRef = collection(db, "registrations");
+      const registrationQuery = query(
+        registrationsRef,
+        where("eventId", "==", eventId),
+        where("displayName", "==", currentUser.displayName)
+      );
+      const registrationSnapshot = await getDocs(registrationQuery);
+
+      if (!registrationSnapshot.empty) {
+        await deleteDoc(registrationSnapshot.docs[0].ref);
+        alert("Registration cancelled successfully!");
+        setRefresh((prev) => !prev); // Refresh the event lists
+      }
+    } catch (error) {
+      console.error("Error cancelling registration:", error);
+    }
+  };
+
   return (
     <div className="dashboard">
       <h2>Participant Dashboard</h2>
@@ -98,7 +122,7 @@ function ParticipantDashboard() {
           <EventList events={allEvents} onRegister={handleRegister} registeredEvents={registeredEvents} />
         )}
         {activeTab === "upcoming" && (
-          <EventList events={upcomingEvents} registeredEvents={registeredEvents} />
+          <EventList events={upcomingEvents} registeredEvents={registeredEvents} onCancel={handleCancelRegistration} />
         )}
         {activeTab === "past" && (
           <EventList events={pastEvents} registeredEvents={registeredEvents} />
@@ -108,19 +132,26 @@ function ParticipantDashboard() {
   );
 }
 
-function EventList({ events, onRegister, registeredEvents }) {
+function EventList({ events, onRegister, onCancel, registeredEvents }) {
   return (
     <div className="event-list">
       {events.length > 0 ? (
         events.map((event) => (
           <div key={event.id} className="event-item">
+            {event.imageUrl && (
+              <img src={event.imageUrl} alt={event.title} className="event-item__image" />
+            )}
             <h4>{event.title}</h4>
             <p>{event.description}</p>
             <p>{new Date(event.date.seconds * 1000).toLocaleString()}</p>
             {onRegister && !registeredEvents.includes(event.id) && (
               <button onClick={() => onRegister(event.id, event.date)}>Register</button>
             )}
-            {registeredEvents.includes(event.id) && <p>Already registered</p>}
+            {registeredEvents.includes(event.id) && onCancel ? (
+              <button onClick={() => onCancel(event.id)}>Cancel Registration</button>
+            ) : registeredEvents.includes(event.id) ? (
+              <p>Already registered</p>
+            ) : null}
           </div>
         ))
       ) : (
