@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { db, auth } from "../firebase";
 import { collection, getDocs, query, where, addDoc, Timestamp, deleteDoc, doc } from "firebase/firestore";
 import "../scss/participantDashboard.scss";
-import Alert from "./Alert"; // Import the custom Alert component
+import Alert from "./Alert"; 
 
 function ParticipantDashboard() {
   const [activeTab, setActiveTab] = useState("all");
@@ -12,9 +12,10 @@ function ParticipantDashboard() {
   const [pastEvents, setPastEvents] = useState([]);
   const [registeredEvents, setRegisteredEvents] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [alertMessage, setAlertMessage] = useState(""); // State for managing alert message
+  const [alertMessage, setAlertMessage] = useState(""); 
   const currentUser = auth.currentUser;
 
+  // Fetching the events from the events collection and quering the email domains to fetch only the events from same domain organizers
   const fetchEvents = async () => {
     if (!currentUser) return;
     const userDomain = currentUser.email.split('@')[1];
@@ -28,6 +29,7 @@ function ParticipantDashboard() {
     setAllEvents(eventsData.filter((event) => new Date(event.date.seconds * 1000) > now));
   };
 
+  // Fetches the registration and sets the registered events, upcoming events, past events
   const fetchUserRegistrations = async () => {
     if (!currentUser) return;
 
@@ -63,6 +65,7 @@ function ParticipantDashboard() {
     if (currentUser) fetchUserRegistrations();
   }, [currentUser, refresh]);
 
+  // Handles the situation when participant clicks on register
   const handleRegister = async (eventId, eventDate) => {
     try {
       if (!currentUser) {
@@ -89,6 +92,7 @@ function ParticipantDashboard() {
     }
   };
 
+  // Handles the situation when a participant cancels registeration by removing the registration from the collection.
   const handleCancelRegistration = async (eventId) => {
     try {
       if (!currentUser) return;
