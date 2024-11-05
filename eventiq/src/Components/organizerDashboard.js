@@ -34,7 +34,7 @@ function OrganizerDashboard() {
     setPastEvents(eventsData.filter((event) => new Date(event.date.seconds * 1000) < now));
     fetchRegistrationCounts(eventsData.map(event => event.id)); 
   };
-
+  // Fetches registration counts to show on each event card created by the specific organizer
   const fetchRegistrationCounts = async (eventIds) => {
     const counts = {};
     for (const eventId of eventIds) {
@@ -55,6 +55,7 @@ function OrganizerDashboard() {
     setEventData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handler for handling uploading image into the firebase storage
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -66,6 +67,7 @@ function OrganizerDashboard() {
     }
   };
 
+  // Hander for creating the event and storing it in firestore database
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) return;
@@ -88,6 +90,7 @@ function OrganizerDashboard() {
     }
   };
 
+  // Hander for deleting the events and removing it from firestore database
   const deleteEvent = async (eventId, imageUrl) => {
     try {
       await deleteDoc(doc(db, "events", eventId));
