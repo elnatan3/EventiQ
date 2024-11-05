@@ -26,9 +26,7 @@ function HomePage() {
     "Effortless event registration and organization.",
     "Secure Google Sign-In for access control.",
     "Exclusive domain-based event access.",
-    "Advanced analytics and reporting.",
-    "Customized event branding.",
-    "24/7 support and assistance.",
+    "Easy reach to all participants",
   ];
 
   return (
