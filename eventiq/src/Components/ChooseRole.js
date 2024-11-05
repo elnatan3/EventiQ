@@ -15,6 +15,8 @@ function ChooseRole({ signInWithGoogle }) {
     }
   };
 
+  
+
   return (
     <div className="choose-role">
       <h2>Select Your Role</h2>
