@@ -6,6 +6,8 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage
 import "../scss/OrganizerDashboard.scss";
 import Alert from "./Alert";
 import { FaTrash } from "react-icons/fa";
+import { FaEnvelope } from "react-icons/fa";
+
 
 function OrganizerDashboard() {
   const [activeTab, setActiveTab] = useState("create");
@@ -119,9 +121,35 @@ function OrganizerDashboard() {
     const registrationsRef = collection(db, "registrations");
     const registeredUsersQuery = query(registrationsRef, where("eventId", "==", eventId));
     const registrationsSnapshot = await getDocs(registeredUsersQuery);
-    const usersData = registrationsSnapshot.docs.map((doc) => doc.data().displayName);
-    setRegisteredUsers(usersData);
+  
+    const usersData = [];
+  
+    for (const registrationDoc of registrationsSnapshot.docs) {
+      const { displayName } = registrationDoc.data();
+      console.log("Fetching email for participant with name:", displayName);
+  
+      const participantsRef = collection(db, "participants");
+      const participantQuery = query(participantsRef, where("name", "==", displayName));
+      const participantSnapshot = await getDocs(participantQuery);
+  
+      if (!participantSnapshot.empty) {
+        const participantData = participantSnapshot.docs[0].data();
+        console.log("Found participant data:", participantData); 
+        usersData.push({
+          displayName: displayName,
+          email: participantData.email,
+        });
+      } else {
+        console.log(`No participant found with name: ${displayName}`);
+        usersData.push({ displayName, email: null });
+      }
+    }
+  
+    setRegisteredUsers(usersData); 
   };
+  
+  
+  
 
   return (
     <div className="dashboard">
@@ -189,21 +217,38 @@ function EventList({ events, onDelete, onToggleRegisteredUsers, selectedEvent, r
 }
 
 function Modal({ onClose, registeredUsers }) {
+  const emailRecipients = registeredUsers
+    .filter((user) => user.email) 
+    .map((user) => encodeURIComponent(user.email)) 
+    .join(",");
+
+  const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${emailRecipients}`;
+
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h3>Registered Users</h3>
+        <FaEnvelope
+          className="email-icon"
+          onClick={() => window.open(gmailLink, "_blank")}
+        />
         <button className="close-button" onClick={onClose}>Close</button>
+        <h3>Registered Users</h3>
         <ul className="registered-users-list">
           {registeredUsers.length > 0 ? (
-            registeredUsers.map((displayName, index) => <li key={index}>{displayName}</li>)
+            registeredUsers.map((user, index) => (
+              <li key={index}>{user.displayName}</li>
+            ))
           ) : (
             <li>No registered users.</li>
           )}
         </ul>
+      
       </div>
     </div>
   );
 }
+
+
+
 
 export default OrganizerDashboard;
