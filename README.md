@@ -14,7 +14,7 @@ Link to app: https://eventiq.tech
 
 ## Real Inspiration
 
-2. Came from my college experience, how different event on campus used google forms to RSVP. This method was sometimes hard for me to remember to attend them. 
+2. Came from my college experience, how different event on campus used google forms to RSVP. This method was sometimes hard for me to remind myself to attend them. 
 3. In addition, I wish I had a place/hub where all the event I attended in college were stored in one place so I can look back on it.
 
 ## This app (SOLUTION)
