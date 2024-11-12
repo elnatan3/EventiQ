@@ -17,7 +17,7 @@ Link to app: https://eventiq.tech
 2. Came from my college experience, how different event on campus used google forms to RSVP. This method was sometimes hard for me to remind myself to attend them. 😱
 3. In addition, I wish I had a place/hub where all the event I attended in college were stored in one place so I can look back on it.😶‍🌫️
 
-## This app ★(SOLUTION)★ ✍️
+## This app ★(SOLUTION)★ 
 
 1. Secure and reliable sign in through google sign-on.😎
 2. Participants only view events from organizers with same email domain, for example, .augustana.edu events would only be viewed by .augustana.edu emails.😃
