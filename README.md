@@ -6,7 +6,7 @@ Link to app: https://eventiq.tech
 
 1. Currently people and various institutions use google forms for many of their event registerations.
 
-=> I found this method
+=> I found this method ★(PROBLEM)★
 1. Very repetitive
 2. Difficult to reach out to participant for change of event details.
 3. Participant do not fully engage with the events before registering in google forms unless event posted elsewhere.
@@ -17,7 +17,7 @@ Link to app: https://eventiq.tech
 2. Came from my college experience, how different event on campus used google forms to RSVP. This method was sometimes hard for me to remind myself to attend them. 
 3. In addition, I wish I had a place/hub where all the event I attended in college were stored in one place so I can look back on it.
 
-## This app (SOLUTION)
+## This app ★(SOLUTION)★
 
 1. Secure and reliable sign in through google sign-on.
 2. Participants only view events from organizers with same email domain, for example, .augustana.edu events would only be viewed by .augustana.edu emails.
